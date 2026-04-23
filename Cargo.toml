@@ -1,0 +1,15 @@
+[package]
+name = "TestWin3D"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+my_x11_gl = { path = "../my_x11_gl" }
+mxgimage = { path = "../mxgimage" }
+math3D = { path = "../math3D" }
+[profile.release]
+opt-level = 3
+lto = true          # Link Time Optimization (очень важно для инлайнинга функций из других модулей)
+codegen-units = 1   # Улучшает оптимизацию за счет долгой компиляции
+panic = "abort"     # Убирает код для раскрутки стека (сильно уменьшает размер)
+strip = true        # Автоматически удаляет отладочную информацию из бинарника
