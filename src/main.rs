@@ -5,11 +5,13 @@ use mxg11l::{
     Event, GlFunctions, GlWindow, KEY_A, KEY_D, KEY_ESCAPE, KEY_S, KEY_TAB, KEY_W, KM_BUTTON_LEFT,
     XDisplay,
 };
+use mxgimage::TgaImage;
+#[allow(non_snake_case)]
 mod autoMesh;
 mod camera;
 mod shaders;
 use crate::{
-    autoMesh::auto_cube::Cube,
+    autoMesh::{auto_cube::Cube, auto_plane::Plane},
     camera::Camera,
     shaders::{FRAG_SRC, VERT_SRC},
 };
@@ -51,7 +53,10 @@ fn main() {
     let pvloc = gl.get_location(program, "pv");
     let texloc = gl.get_location(program, "tex");
     let modelloc = gl.get_location(program, "model");
-    let cube = Cube::new(&gl, "geometry.tga", texloc, modelloc);
+    let image = TgaImage::load("geometry.tga");
+    let tex = gl.create_texture_bgra(512, 512, &image.pixels);
+    let cube = Cube::new(&gl, tex, texloc, modelloc);
+    let palne = Plane::new(&gl, tex, texloc, modelloc);
     //println!("{:?}", pvloc);
     gl.enable_depth_test();
 
@@ -137,6 +142,7 @@ fn main() {
         gl.use_program(program);
         gl.uniform_matrix_4fv(pvloc, 1, pv.cols.as_ptr() as *const f32);
         cube.draw(&gl);
+        palne.draw(&gl);
         window.swap_buffers();
     }
 }

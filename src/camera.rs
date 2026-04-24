@@ -37,6 +37,7 @@ pub struct Camera {
     pub pitch: f32, // Поворот вверх-вниз
     pub walk_speed: f32,
 }
+#[allow(non_snake_case, unused)]
 #[rustfmt::skip]
 impl Camera {
     pub fn new(position: Vec3f) -> Self {
