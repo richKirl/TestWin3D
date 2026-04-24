@@ -7,6 +7,7 @@ edition = "2024"
 my_x11_gl = { path = "../my_x11_gl" }
 mxgimage = { path = "../mxgimage" }
 math3D = { path = "../math3D" }
+mxgfs = { path = "../mxgfs" }
 [profile.release]
 opt-level = 3
 lto = true          # Link Time Optimization (очень важно для инлайнинга функций из других модулей)
