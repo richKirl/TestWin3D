@@ -3,7 +3,7 @@ use math3d::{dualquatf, frustum, mat4vf, quatf, vec3d, vec3f, vec4d, vec4f};
 use math3d::{mat4vf::Mat4vf, vec3f::Vec3f};
 use mxg11l::{
     Event, GlFunctions, GlWindow, KEY_A, KEY_D, KEY_ESCAPE, KEY_S, KEY_TAB, KEY_W, KM_BUTTON_LEFT,
-    XDisplay,
+    Timer, XDisplay,
 };
 use mxgimage::TgaImage;
 #[allow(non_snake_case)]
@@ -15,6 +15,24 @@ use crate::{
     camera::Camera,
     shaders::{FRAG_SRC, VERT_SRC},
 };
+
+struct InputState {
+    pub w: bool,
+    pub a: bool,
+    pub s: bool,
+    pub d: bool,
+}
+
+impl InputState {
+    pub fn new() -> Self {
+        Self {
+            a: false,
+            d: false,
+            s: false,
+            w: false,
+        }
+    }
+}
 
 fn main() {
     let width = 800.0;
@@ -53,15 +71,18 @@ fn main() {
     let pvloc = gl.get_location(program, "pv");
     let texloc = gl.get_location(program, "tex");
     let modelloc = gl.get_location(program, "model");
-    let image = TgaImage::load("geometry.tga");
+    let image = TgaImage::load("geometry2.tga");
     let tex = gl.create_texture_bgra(512, 512, &image.pixels);
     let cube = Cube::new(&gl, tex, texloc, modelloc);
     let palne = Plane::new(&gl, tex, texloc, modelloc);
     //println!("{:?}", pvloc);
     gl.enable_depth_test();
+    let mut input = InputState::new();
+    let mut timer = Timer::new();
 
     //gl.disable_cull_face();
     while running {
+        timer.update();
         // Красивый и безопасный опрос событий
         for event in window.poll_events() {
             match event {
@@ -105,22 +126,32 @@ fn main() {
                         } else {
                             gl.polygonmode_front_back_fill();
                         }
-                    }
+                    } // tab
                     if keysym == KEY_W {
-                        camera.position += camera.forward * camera.walk_speed;
+                        input.w = true;
                     }
                     if keysym == KEY_S {
-                        camera.position -= camera.forward * camera.walk_speed;
+                        input.s = true;
                     }
                     if keysym == KEY_A {
-                        camera.position -=
-                            camera.forward.cross(Vec3f::new(0.0, 1.0, 0.0)).normalize()
-                                * camera.walk_speed;
+                        input.a = true;
                     }
                     if keysym == KEY_D {
-                        camera.position +=
-                            camera.forward.cross(Vec3f::new(0.0, 1.0, 0.0)).normalize()
-                                * camera.walk_speed;
+                        input.d = true;
+                    }
+                }
+                Event::KeyRelease { keysym, .. } => {
+                    if keysym == KEY_W {
+                        input.w = false;
+                    }
+                    if keysym == KEY_S {
+                        input.s = false;
+                    }
+                    if keysym == KEY_A {
+                        input.a = false;
+                    }
+                    if keysym == KEY_D {
+                        input.d = false;
                     }
                 }
                 Event::MouseButtonPress { button, .. } => {
@@ -134,6 +165,7 @@ fn main() {
                 _ => {}
             }
         }
+        camera.update_input(&input, &timer);
         //println!("{:?}", camera.position);
         gl.clear_color_depth(0.2, 0.4, 0.6, 1.0);
         let view = camera.get_view_matrix();
