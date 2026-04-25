@@ -64,21 +64,10 @@ fn main() {
     let mut input = InputState::new();
     let mut timer = Timer::new();
 
-    let mut fps_timer = 0.0;
-    let mut frame_count = 0;
     //gl.disable_cull_face();
     while running {
         timer.update();
-        // fps_timer += timer.delta_time;
-        // frame_count += 1;
 
-        // if fps_timer >= 1.0 {
-        //     println!("FPS: {}", frame_count);
-        //     // Или выведи в заголовок окна:
-        //     // window.set_title(&format!("My Engine - FPS: {}", frame_count));
-        //     fps_timer = 0.0;
-        //     frame_count = 0;
-        // }
         // Красивый и безопасный опрос событий
         for event in window.poll_events() {
             match event {
@@ -174,6 +163,4 @@ fn main() {
         window.swap_buffers();
     }
     gl.delete_program(program);
-    // palne.clear(&gl);
-    // cube.clear(&gl);
 }
