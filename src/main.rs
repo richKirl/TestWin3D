@@ -57,8 +57,8 @@ fn main() {
     let modelloc = gl.get_location(program, "model");
     let image = TgaImage::load("geometry2.tga");
     let tex = gl.create_texture_bgra(512, 512, &image.pixels);
-    let mut cube = Cube::new(&gl, tex, texloc, modelloc);
-    let mut palne = Plane::new(&gl, tex, texloc, modelloc);
+    let cube = Cube::new(&gl, tex, texloc, modelloc);
+    let palne = Plane::new(&gl, tex, texloc, modelloc);
     //println!("{:?}", pvloc);
     gl.enable_depth_test();
     let mut input = InputState::new();
@@ -173,6 +173,7 @@ fn main() {
         palne.draw(&gl);
         window.swap_buffers();
     }
-    palne.clear(&gl);
-    cube.clear(&gl);
+    gl.delete_program(program);
+    // palne.clear(&gl);
+    // cube.clear(&gl);
 }

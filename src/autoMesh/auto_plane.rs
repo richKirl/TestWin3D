@@ -3,15 +3,16 @@ use math3d::mat4vf::Mat4vf;
 use mxg11l::GlFunctions;
 
 use crate::autoMesh::auto_mesh::VERTICES_PLANE;
-pub struct Plane {
+pub struct Plane<'a> {
     vao: u32,
     texture: u32,
     loc_tex: i32,
     loc_model: i32,
+    gl: &'a GlFunctions,
 }
 
-impl Plane {
-    pub fn new(gl: &GlFunctions, text: u32, loct: i32, locm: i32) -> Self {
+impl<'a> Plane<'a> {
+    pub fn new(gl: &'a GlFunctions, text: u32, loct: i32, locm: i32) -> Self {
         let vertices = VERTICES_PLANE;
         let (mut vao, mut vbo) = (0, 0);
         gl.gen_vertex_arrays(1, &mut vao);
@@ -50,6 +51,7 @@ impl Plane {
             texture: text,
             loc_tex: loct,
             loc_model: locm,
+            gl: gl,
         }
     }
     pub fn draw(&self, gl: &GlFunctions) {
@@ -65,9 +67,16 @@ impl Plane {
         gl.bind_vertex_array(self.vao);
         gl.draw_arrays_triangles(0, 6);
     }
-    pub fn clear(&mut self, gl: &GlFunctions) {
-        gl.delete_vertex_arrays(1, &self.vao);
-        // gl.delete_buffers(1, &self.vb);
-        gl.delete_textures(1, &self.texture);
+    // pub fn clear(&mut self, gl: &GlFunctions) {
+    //     gl.delete_vertex_arrays(1, &self.vao);
+    //     // gl.delete_buffers(1, &self.vb);
+    //     gl.delete_textures(1, &self.texture);
+    // }
+}
+impl<'a> Drop for Plane<'a> {
+    fn drop(&mut self) {
+        self.gl.delete_vertex_arrays(1, &self.vao);
+        // gl.deleteBuffers(1, &self.vbo);
+        self.gl.delete_textures(1, &self.texture);
     }
 }
