@@ -9,30 +9,14 @@ use mxgimage::TgaImage;
 #[allow(non_snake_case)]
 mod autoMesh;
 mod camera;
+mod input_handle;
 mod shaders;
 use crate::{
     autoMesh::{auto_cube::Cube, auto_plane::Plane},
     camera::Camera,
+    input_handle::InputState,
     shaders::{FRAG_SRC, VERT_SRC},
 };
-
-struct InputState {
-    pub w: bool,
-    pub a: bool,
-    pub s: bool,
-    pub d: bool,
-}
-
-impl InputState {
-    pub fn new() -> Self {
-        Self {
-            a: false,
-            d: false,
-            s: false,
-            w: false,
-        }
-    }
-}
 
 fn main() {
     let width = 800.0;
@@ -73,16 +57,28 @@ fn main() {
     let modelloc = gl.get_location(program, "model");
     let image = TgaImage::load("geometry2.tga");
     let tex = gl.create_texture_bgra(512, 512, &image.pixels);
-    let cube = Cube::new(&gl, tex, texloc, modelloc);
-    let palne = Plane::new(&gl, tex, texloc, modelloc);
+    let mut cube = Cube::new(&gl, tex, texloc, modelloc);
+    let mut palne = Plane::new(&gl, tex, texloc, modelloc);
     //println!("{:?}", pvloc);
     gl.enable_depth_test();
     let mut input = InputState::new();
     let mut timer = Timer::new();
 
+    let mut fps_timer = 0.0;
+    let mut frame_count = 0;
     //gl.disable_cull_face();
     while running {
         timer.update();
+        // fps_timer += timer.delta_time;
+        // frame_count += 1;
+
+        // if fps_timer >= 1.0 {
+        //     println!("FPS: {}", frame_count);
+        //     // Или выведи в заголовок окна:
+        //     // window.set_title(&format!("My Engine - FPS: {}", frame_count));
+        //     fps_timer = 0.0;
+        //     frame_count = 0;
+        // }
         // Красивый и безопасный опрос событий
         for event in window.poll_events() {
             match event {
@@ -177,4 +173,6 @@ fn main() {
         palne.draw(&gl);
         window.swap_buffers();
     }
+    palne.clear(&gl);
+    cube.clear(&gl);
 }

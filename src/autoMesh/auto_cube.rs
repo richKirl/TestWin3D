@@ -65,12 +65,17 @@ impl Cube {
         gl.bind_vertex_array(self.vao);
         gl.draw_arrays_triangles(0, 36);
     }
+    pub fn clear(&mut self, gl: &GlFunctions) {
+        gl.delete_vertex_arrays(1, &self.vao);
+        // gl.delete_buffers(1, &self.vb);
+        gl.delete_textures(1, &self.texture);
+    }
 }
 // impl Drop for Cube {
 //     fn drop(&mut self) {
 //         unsafe {
-//             gl::DeleteVertexArrays(1, &self.vao);
-//             gl::DeleteBuffers(1, &self.vbo);
+//             gl.delete_vertex_arrays(1, &self.vao);
+//             gl.deleteBuffers(1, &self.vbo);
 //         }
 //     }
 // }

@@ -65,4 +65,9 @@ impl Plane {
         gl.bind_vertex_array(self.vao);
         gl.draw_arrays_triangles(0, 6);
     }
+    pub fn clear(&mut self, gl: &GlFunctions) {
+        gl.delete_vertex_arrays(1, &self.vao);
+        // gl.delete_buffers(1, &self.vb);
+        gl.delete_textures(1, &self.texture);
+    }
 }
