@@ -2,8 +2,8 @@
 use math3d::{dualquatf, frustum, mat4vf, quatf, vec3d, vec3f, vec4d, vec4f};
 use math3d::{mat4vf::Mat4vf, vec3f::Vec3f};
 use mxg11l::{
-    Event, GlFunctions, GlWindow, KEY_A, KEY_D, KEY_ESCAPE, KEY_S, KEY_TAB, KEY_W, KM_BUTTON_LEFT,
-    Timer, XDisplay,
+    Event, GlDebugExt, GlFunctions, GlWindow, KEY_A, KEY_D, KEY_ESCAPE, KEY_S, KEY_TAB, KEY_W,
+    KM_BUTTON_LEFT, Timer, XDisplay,
 };
 use mxgimage::TgaImage;
 #[allow(non_snake_case)]
@@ -23,8 +23,17 @@ fn main() {
     let height = 600.0;
     // 1. Инициализация (все unsafe скрыто внутри)
     let display = XDisplay::open().expect("Не удалось открыть X11 -- display");
-    let window = GlWindow::new(&display, "Test Rust Library", width as u32, height as u32)
-        .expect("Не удалось открыть window -- window");
+    let window = GlWindow::new(
+        &display,
+        "Test Rust Library",
+        width as u32,
+        height as u32,
+        4,
+        6,
+    )
+    .expect("Не удалось открыть window -- window")
+    .display_version_debug();
+
     let gl = GlFunctions::load();
     window.set_vsync(&gl, true);
     // 1. Исходники шейдеров

@@ -5,6 +5,7 @@ use mxg11l::GlFunctions;
 use crate::autoMesh::auto_mesh::VERTICES_CUBE;
 pub struct Cube<'a> {
     vao: u32,
+    vbo: u32,
     texture: u32,
     loc_tex: i32,
     loc_model: i32,
@@ -48,6 +49,7 @@ impl<'a> Cube<'a> {
 
         Self {
             vao: vao,
+            vbo: vbo,
             texture: text,
             loc_tex: loct,
             loc_model: locm,
@@ -56,27 +58,18 @@ impl<'a> Cube<'a> {
     }
     pub fn draw(&self, gl: &GlFunctions) {
         gl.uniform_1i(self.loc_tex, 0);
-        gl.uniform_matrix_4fv(
-            self.loc_model,
-            1,
-            Mat4vf::identity().cols.as_ptr() as *const f32,
-        );
+        gl.uniform_matrix_4fv(self.loc_model, 1, Mat4vf::IDENTITY.as_ptr());
 
         gl.active_texture0();
         gl.bind_texture_2d(self.texture);
         gl.bind_vertex_array(self.vao);
         gl.draw_arrays_triangles(0, 36);
     }
-    // pub fn clear(&mut self, gl: &GlFunctions) {
-    //     gl.delete_vertex_arrays(1, &self.vao);
-    //     // gl.delete_buffers(1, &self.vb);
-    //     gl.delete_textures(1, &self.texture);
-    // }
 }
 impl<'a> Drop for Cube<'a> {
     fn drop(&mut self) {
         self.gl.delete_vertex_arrays(1, &self.vao);
-        // gl.deleteBuffers(1, &self.vbo);
+        self.gl.delete_buffers(1, &self.vbo);
         self.gl.delete_textures(1, &self.texture);
     }
 }
