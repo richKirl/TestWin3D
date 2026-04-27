@@ -2,8 +2,8 @@
 use math3d::{dualquatf, frustum, mat4vf, quatf, vec3d, vec3f, vec4d, vec4f};
 use math3d::{mat4vf::Mat4vf, vec3f::Vec3f};
 use mxg11l::{
-    Event, GlDebugExt, GlFunctions, GlWindow, KEY_A, KEY_D, KEY_ESCAPE, KEY_S, KEY_TAB, KEY_W,
-    KM_BUTTON_LEFT, Timer, XDisplay,
+    Event, GlDebugExt, GlDepthExt, GlFunctions, GlVsyncExt, GlWindow, KEY_A, KEY_D, KEY_ESCAPE,
+    KEY_S, KEY_TAB, KEY_W, KM_BUTTON_LEFT, Timer, XDisplay,
 };
 use mxgimage::TgaImage;
 #[allow(non_snake_case)]
@@ -12,7 +12,7 @@ mod camera;
 mod input_handle;
 mod shaders;
 use crate::{
-    autoMesh::{auto_cube::Cube, auto_plane::Plane},
+    autoMesh::auto_cube::Cube,
     camera::Camera,
     input_handle::InputState,
     shaders::{FRAG_SRC, VERT_SRC},
@@ -21,6 +21,7 @@ use crate::{
 fn main() {
     let width = 800.0;
     let height = 600.0;
+    let gl = GlFunctions::load();
     // 1. Инициализация (все unsafe скрыто внутри)
     let display = XDisplay::open().expect("Не удалось открыть X11 -- display");
     let window = GlWindow::new(
@@ -32,10 +33,10 @@ fn main() {
         6,
     )
     .expect("Не удалось открыть window -- window")
-    .display_version_debug();
+    .display_version_debug()
+    .add_vsync(&gl, true)
+    .add_depth_with_alpha();
 
-    let gl = GlFunctions::load();
-    window.set_vsync(&gl, true);
     // 1. Исходники шейдеров
     // ============================================================
     // ============================================================
@@ -67,13 +68,11 @@ fn main() {
     let image = TgaImage::load("geometry2.tga");
     let tex = gl.create_texture_bgra(512, 512, &image.pixels);
     let cube = Cube::new(&gl, tex, texloc, modelloc);
-    let palne = Plane::new(&gl, tex, texloc, modelloc);
+    // let palne = Plane::new(&gl, tex, texloc, modelloc);
     //println!("{:?}", pvloc);
-    gl.enable_depth_test();
     let mut input = InputState::new();
     let mut timer = Timer::new();
 
-    //gl.disable_cull_face();
     while running {
         timer.update();
 
@@ -112,7 +111,7 @@ fn main() {
                         } else if !togle_mouse {
                             running = false;
                         }
-                    } // Esc
+                    } // Esc lag
                     if keysym == KEY_TAB {
                         toggle_warframe = !toggle_warframe;
                         if toggle_warframe {
@@ -120,33 +119,33 @@ fn main() {
                         } else {
                             gl.polygonmode_front_back_fill();
                         }
-                    } // tab
+                    } // tab  lag
                     if keysym == KEY_W {
                         input.w = true;
-                    }
+                    } //w nolag
                     if keysym == KEY_S {
                         input.s = true;
-                    }
+                    } //s nolag
                     if keysym == KEY_A {
                         input.a = true;
-                    }
+                    } //a nolag
                     if keysym == KEY_D {
                         input.d = true;
-                    }
+                    } //d nolag
                 }
                 Event::KeyRelease { keysym, .. } => {
                     if keysym == KEY_W {
                         input.w = false;
-                    }
+                    } //w nolag
                     if keysym == KEY_S {
                         input.s = false;
-                    }
+                    } //s nolag
                     if keysym == KEY_A {
                         input.a = false;
-                    }
+                    } //a nolag
                     if keysym == KEY_D {
                         input.d = false;
-                    }
+                    } //d nolag
                 }
                 Event::MouseButtonPress { button, .. } => {
                     if button == KM_BUTTON_LEFT {
@@ -154,7 +153,7 @@ fn main() {
                             togle_mouse = true;
                             window.hide_cursor();
                         }
-                    }
+                    } //left lag
                 }
                 _ => {}
             }
@@ -166,9 +165,9 @@ fn main() {
         let proj = Mat4vf::perspective(45.0f32.to_radians(), aspect_r, 0.1, 1000.0);
         let pv = proj * view; //proj * view * Mat4vf::identity()
         gl.use_program(program);
-        gl.uniform_matrix_4fv(pvloc, 1, pv.cols.as_ptr() as *const f32);
+        gl.uniform_matrix_4fv(pvloc, 1, pv.as_ptr());
         cube.draw(&gl);
-        palne.draw(&gl);
+        //palne.draw(&gl);
         window.swap_buffers();
     }
     gl.delete_program(program);
