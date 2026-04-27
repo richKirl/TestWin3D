@@ -8,33 +8,19 @@ use mxg11l::{
 use mxgimage::TgaImage;
 #[allow(non_snake_case)]
 mod autoMesh;
+mod basetoggles;
 mod camera;
 mod input_handle;
 mod shader;
 mod shaders;
 use crate::{
     autoMesh::auto_cube::Cube,
+    basetoggles::BaseToggles,
     camera::Camera,
     input_handle::InputState,
     shader::Shader,
     shaders::{FRAG_SRC, VERT_SRC},
 };
-
-pub struct Toggles {
-    pub running: bool,
-    pub togle_mouse: bool,
-    pub toggle_wireframe: bool,
-}
-
-impl Toggles {
-    pub fn new() -> Self {
-        Self {
-            running: false,
-            togle_mouse: false,
-            toggle_wireframe: false,
-        }
-    }
-}
 
 fn main() {
     let width = 800.0;
@@ -63,7 +49,7 @@ fn main() {
     let mut center_x = (width / 2.0) as i32;
     let mut center_y = (height / 2.0) as i32;
 
-    let mut toogles = Toggles::new();
+    let mut toogles = BaseToggles::new();
 
     let shader_main = Shader::new(vec![VERT_SRC, FRAG_SRC], &gl);
     // ===========================================================
