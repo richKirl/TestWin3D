@@ -58,4 +58,24 @@ update2
 ==105134== LL misses:         408,539  (   184,109 rd   +    224,430 wr)
 ==105134== LL miss rate:          0.1% (       0.1%     +        0.4%  )
 
+
+update3 stress test chaos clicked mpuse and move with wasd chaos press
+
+==20596== I refs:        424,379,103
+==20596== I1  misses:     16,767,285
+==20596== LLi misses:         48,209
+==20596== I1  miss rate:        3.95%
+==20596== LLi miss rate:        0.01%
+==20596== 
+==20596== D refs:        187,778,820  (112,184,457 rd   + 75,594,363 wr)
+==20596== D1  misses:      8,460,913  (  5,430,652 rd   +  3,030,261 wr)
+==20596== LLd misses:        361,193  (    137,946 rd   +    223,247 wr)
+==20596== D1  miss rate:         4.5% (        4.8%     +        4.0%  )
+==20596== LLd miss rate:         0.2% (        0.1%     +        0.3%  )
+==20596== 
+==20596== LL refs:        25,228,198  ( 22,197,937 rd   +  3,030,261 wr)
+==20596== LL misses:         409,402  (    186,155 rd   +    223,247 wr)
+==20596== LL miss rate:          0.1% (        0.0%     +        0.3%  )
+
+
 ```
