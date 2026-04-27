@@ -77,5 +77,22 @@ update3 stress test chaos clicked mpuse and move with wasd chaos press
 ==20596== LL misses:         409,402  (    186,155 rd   +    223,247 wr)
 ==20596== LL miss rate:          0.1% (        0.0%     +        0.3%  )
 
+update4 after shader and toggle refactoring just open and waiting
+
+==317951== I refs:        286,122,311
+==317951== I1  misses:     10,004,480
+==317951== LLi misses:         47,296
+==317951== I1  miss rate:        3.50%
+==317951== LLi miss rate:        0.02%
+==317951== 
+==317951== D refs:        123,470,337  (71,874,094 rd   + 51,596,243 wr)
+==317951== D1  misses:      5,358,394  ( 3,417,145 rd   +  1,941,249 wr)
+==317951== LLd misses:        361,382  (   137,281 rd   +    224,101 wr)
+==317951== D1  miss rate:         4.3% (       4.8%     +        3.8%  )
+==317951== LLd miss rate:         0.3% (       0.2%     +        0.4%  )
+==317951== 
+==317951== LL refs:        15,362,874  (13,421,625 rd   +  1,941,249 wr)
+==317951== LL misses:         408,678  (   184,577 rd   +    224,101 wr)
+==317951== LL miss rate:          0.1% (       0.1%     +        0.4%  )
 
 ```
