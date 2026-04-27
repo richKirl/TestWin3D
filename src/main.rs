@@ -1,6 +1,6 @@
 #[allow(non_snake_case, unused)]
 use math3d::{dualquatf, frustum, mat4vf, quatf, vec3d, vec3f, vec4d, vec4f};
-use math3d::{mat4vf::Mat4vf, vec3f::Vec3f};
+use math3d::{mat4vf::Mat4vf, vec3f::Vec3f, vec4f::Vec4f};
 use mxg11l::{
     Event, GlDebugExt, GlDepthExt, GlFunctions, GlVsyncExt, GlWindow, KEY_A, KEY_D, KEY_ESCAPE,
     KEY_S, KEY_TAB, KEY_W, KM_BUTTON_LEFT, Timer, XDisplay,
@@ -21,11 +21,22 @@ use crate::{
     shader::Shader,
     shaders::{FRAG_SRC, VERT_SRC},
 };
-
+// ============================================================
+// ============================================================
 fn main() {
+    // ============================================================
+    // ============================================================
     let width = 800.0;
     let height = 600.0;
+    let mut center_x = (width / 2.0) as i32;
+    let mut center_y = (height / 2.0) as i32;
+    let backgound = Vec4f::new(0.22, 0.44, 0.66, 1.0);
+    let mut option_perspective = Vec4f::new(45.0f32.to_radians(), width / height, 0.1, 1000.0);
+    // ============================================================
+    // ============================================================
     let gl = GlFunctions::load();
+    // ============================================================
+    // ============================================================
     // 1. Инициализация (все unsafe скрыто внутри)
     let display = XDisplay::open().expect("Не удалось открыть X11 -- display");
     let window = GlWindow::new(
@@ -41,28 +52,35 @@ fn main() {
     .add_vsync(&gl, true)
     .add_depth_with_alpha();
 
-    // 1. Исходники шейдеров
     // ============================================================
     // ============================================================
-
-    let mut aspect_r = width / height;
-    let mut center_x = (width / 2.0) as i32;
-    let mut center_y = (height / 2.0) as i32;
 
     let mut toogles = BaseToggles::new();
-
+    // ============================================================
+    // ============================================================
     let shader_main = Shader::new(vec![VERT_SRC, FRAG_SRC], &gl);
     // ===========================================================
     // ===========================================================*vec4(0.3,0.5,0.3,1.0);
     let mut camera = Camera::new(Vec3f::new(0.0, 0.0, 5.0));
+    // ============================================================
+    // ============================================================
     // 2. Цикл отрисовки
     let image = TgaImage::load("geometry2.tga");
     let tex = gl.create_texture_bgra(512, 512, &image.pixels);
+    // ============================================================
+    // ============================================================
     let cube = Cube::new(&gl, tex);
-
+    // ============================================================
+    // ============================================================
     let mut input = InputState::new();
+    // ============================================================
+    // ============================================================
     let mut timer = Timer::new();
+    // ============================================================
+    // ============================================================
     toogles.running = true;
+    // ============================================================
+    // ============================================================
     while toogles.running {
         timer.update();
 
@@ -74,7 +92,7 @@ fn main() {
                 }
                 Event::Resize { width, height } => {
                     gl.viewport(width, height);
-                    aspect_r = width as f32 / height as f32;
+                    option_perspective.y = width as f32 / height as f32; //aspect
                     center_x = (width as f32 / 2.0) as i32;
                     center_y = (height as f32 / 2.0) as i32;
                 }
@@ -150,9 +168,14 @@ fn main() {
         }
         camera.update_input(&input, &timer);
         //println!("{:?}", camera.position);
-        gl.clear_color_depth(0.2, 0.4, 0.6, 1.0);
+        gl.clear_color_depth(backgound.x, backgound.y, backgound.z, backgound.w);
         let view = camera.get_view_matrix();
-        let proj = Mat4vf::perspective(45.0f32.to_radians(), aspect_r, 0.1, 1000.0);
+        let proj = Mat4vf::perspective(
+            option_perspective.x, //FOV
+            option_perspective.y, //aspect
+            option_perspective.z, //near
+            option_perspective.w, //far
+        );
         let pv = proj * view; //proj * view * Mat4vf::identity()
         shader_main.use_shader();
         shader_main.set_mat4("pv", &pv);
