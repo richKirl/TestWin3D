@@ -2,18 +2,18 @@
 use math3d::mat4vf::Mat4vf;
 use mxg11l::GlFunctions;
 
-use crate::autoMesh::auto_mesh::VERTICES_CUBE;
+use crate::{Shader, autoMesh::auto_mesh::VERTICES_CUBE};
 pub struct Cube<'a> {
     vao: u32,
     vbo: u32,
     texture: u32,
-    loc_tex: i32,
-    loc_model: i32,
+    // loc_tex: i32,
+    // loc_model: i32,
     gl: &'a GlFunctions,
 }
 
 impl<'a> Cube<'a> {
-    pub fn new(gl: &'a GlFunctions, text: u32, loct: i32, locm: i32) -> Self {
+    pub fn new(gl: &'a GlFunctions, text: u32) -> Self {
         let vertices = VERTICES_CUBE;
         let (mut vao, mut vbo) = (0, 0);
         gl.gen_vertex_arrays(1, &mut vao);
@@ -51,14 +51,16 @@ impl<'a> Cube<'a> {
             vao: vao,
             vbo: vbo,
             texture: text,
-            loc_tex: loct,
-            loc_model: locm,
+            // loc_tex: loct,
+            // loc_model: locm,
             gl: gl,
         }
     }
-    pub fn draw(&self, gl: &GlFunctions) {
-        gl.uniform_1i(self.loc_tex, 0);
-        gl.uniform_matrix_4fv(self.loc_model, 1, Mat4vf::IDENTITY.as_ptr());
+    pub fn draw(&self, gl: &GlFunctions, shader: &Shader) {
+        shader.set_int("tex", 0);
+        shader.set_mat4("model", Mat4vf::IDENTITY);
+        // gl.uniform_1i(self.loc_tex, 0);
+        // gl.uniform_matrix_4fv(self.loc_model, 1, Mat4vf::IDENTITY.as_ptr());
 
         gl.active_texture0();
         gl.bind_texture_2d(self.texture);
