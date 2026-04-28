@@ -26,12 +26,14 @@ use crate::{
 fn main() {
     // ============================================================
     // ============================================================
-    let width = 800.0;
-    let height = 600.0;
-    let mut center_x = (width / 2.0) as i32;
-    let mut center_y = (height / 2.0) as i32;
+    let mut option_window = Vec4f::new(800.0, 600.0, 800.0 / 2.0, 600.0 / 2.0);
     let backgound = Vec4f::new(0.22, 0.44, 0.66, 1.0);
-    let mut option_perspective = Vec4f::new(45.0f32.to_radians(), width / height, 0.1, 1000.0);
+    let mut option_perspective = Vec4f::new(
+        45.0f32.to_radians(),
+        option_window.x / option_window.y,
+        0.1,
+        1000.0,
+    );
     // ============================================================
     // ============================================================
     let gl = GlFunctions::load();
@@ -42,8 +44,8 @@ fn main() {
     let window = GlWindow::new(
         &display,
         "Test Rust Library",
-        width as u32,
-        height as u32,
+        option_window.x as u32,
+        option_window.y as u32,
         4,
         6,
     )
@@ -93,21 +95,21 @@ fn main() {
                 Event::Resize { width, height } => {
                     gl.viewport(width, height);
                     option_perspective.y = width as f32 / height as f32; //aspect
-                    center_x = (width as f32 / 2.0) as i32;
-                    center_y = (height as f32 / 2.0) as i32;
+                    option_window.z = width as f32 / 2.0;
+                    option_window.w = height as f32 / 2.0;
                 }
                 Event::MouseMove { x, y } => {
                     // 1. Считаем смещение относительно центра
                     if toogles.togle_mouse {
-                        let dx = x - center_x;
-                        let dy = y - center_y;
+                        let dx = x - option_window.z as i32;
+                        let dy = y - option_window.w as i32;
 
                         // 2. Если мышь сдвинулась, обновляем камеру и возвращаем курсор назад
                         if dx != 0 || dy != 0 {
                             camera.update_angles(dx, dy);
 
                             // 3. Важно: возвращаем мышь в центр, чтобы она никогда не дошла до края
-                            window.warp_center(center_x, center_y);
+                            window.warp_center(option_window.z as i32, option_window.w as i32);
                         }
                     }
                 }
