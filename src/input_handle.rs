@@ -1,9 +1,9 @@
-use math3d::{mat4vf::Mat4vf, vec4f::Vec4f};
+use math3d::mat4vf::Mat4vf;
 use mxg11l::{
     Event, GlFunctions, GlWindow, KEY_A, KEY_D, KEY_ESCAPE, KEY_S, KEY_TAB, KEY_W, KM_BUTTON_LEFT,
 };
 
-use crate::{basetoggles::BaseToggles, camera::Camera};
+use crate::{BaseState, basetoggles::BaseToggles, camera::Camera};
 
 pub struct InputState {
     pub w: bool,
@@ -21,59 +21,50 @@ impl InputState {
             w: false,
         }
     }
-    pub fn handle_events(
-        &mut self,
-        window: &GlWindow,
-        gl: &GlFunctions,
-        camera: &mut Camera,
-        toggles: &mut BaseToggles,
-        // Параметры окна и проекции передаем как мутабельные ссылки
-        opt_window: &mut Vec4f,
-        opt_persp: &mut Vec4f,
-        proj: &mut Mat4vf,
-    ) {
-        for event in window.poll_events() {
+    pub fn handle_events(&mut self, camera: &mut Camera, base: &mut BaseState) {
+        for event in base.window.poll_events() {
             match event {
-                Event::ClientMessage => toggles.running = false,
+                Event::ClientMessage => base.basetoggles.running = false,
 
                 Event::Resize { width, height } => {
-                    gl.viewport(width, height);
-                    opt_persp.set_aspect(width as f32 / height as f32);
-                    opt_window.set_center_x(width as f32 * 0.5);
-                    opt_window.set_center_y(height as f32 * 0.5);
-                    *proj = Mat4vf::perspective(
-                        opt_persp.fov(),
-                        opt_persp.aspect(),
-                        opt_persp.near(),
-                        opt_persp.far(),
+                    base.gl.viewport(width, height);
+                    base.perspective_config
+                        .set_aspect(width as f32 / height as f32);
+                    base.window_config.set_center_x(width as f32 * 0.5);
+                    base.window_config.set_center_y(height as f32 * 0.5);
+                    base.projection = Mat4vf::perspective(
+                        base.perspective_config.fov(),
+                        base.perspective_config.aspect(),
+                        base.perspective_config.near(),
+                        base.perspective_config.far(),
                     );
                 }
 
                 Event::MouseMove { x, y } => {
-                    if toggles.togle_mouse {
-                        let dx = x - opt_window.center_x() as i32;
-                        let dy = y - opt_window.center_y() as i32;
+                    if base.basetoggles.togle_mouse {
+                        let dx = x - base.window_config.center_x() as i32;
+                        let dy = y - base.window_config.center_y() as i32;
                         if dx != 0 || dy != 0 {
                             camera.update_angles(dx, dy);
-                            window.warp_center(
-                                opt_window.center_x() as i32,
-                                opt_window.center_y() as i32,
+                            base.window.warp_center(
+                                base.window_config.center_x() as i32,
+                                base.window_config.center_y() as i32,
                             );
                         }
                     }
                 }
 
                 Event::KeyPress { keysym, .. } => {
-                    self.process_key(keysym, true, toggles, window, gl)
+                    self.process_key(keysym, true, &mut base.basetoggles, &base.window, base.gl)
                 }
                 Event::KeyRelease { keysym, .. } => {
-                    self.process_key(keysym, false, toggles, window, gl)
+                    self.process_key(keysym, false, &mut base.basetoggles, &base.window, base.gl)
                 }
 
                 Event::MouseButtonPress { button, .. } => {
-                    if button == KM_BUTTON_LEFT && !toggles.togle_mouse {
-                        toggles.togle_mouse = true;
-                        window.hide_cursor();
+                    if button == KM_BUTTON_LEFT && !base.basetoggles.togle_mouse {
+                        base.basetoggles.togle_mouse = true;
+                        base.window.hide_cursor();
                     }
                 }
                 _ => {}
