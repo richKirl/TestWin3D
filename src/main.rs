@@ -45,13 +45,15 @@ fn main() {
     let cube = Cube::new(&gl, tex);
 
     let mut instances = Vec::new();
-    for x in -5..5 {
-        for z in -5..5 {
-            instances.push(Transformer::new(
-                Vec3f::new(x as f32 * 1.0, 0.0, z as f32 * 1.0),
-                Quatf::identity(),
-                Vec3f::new(1.0, 1.0, 1.0),
-            ));
+    for y in 0..256 {
+        for x in -5..5 {
+            for z in -5..5 {
+                instances.push(Transformer::new(
+                    Vec3f::new(x as f32 * 1.0, y as f32 * 1.0, z as f32 * 1.0),
+                    Quatf::identity(),
+                    Vec3f::new(1.0, 1.0, 1.0),
+                ));
+            }
         }
     }
     // ============================================================
