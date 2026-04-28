@@ -21,16 +21,12 @@ use crate::{
     shader::Shader,
     shaders::{FRAG_SRC, VERT_SRC},
 };
-// ============================================================
-// ============================================================
 fn main() {
-    // ============================================================
-    // ============================================================
     let mut option_window = Vec4f::new(800.0, 600.0, 800.0 / 2.0, 600.0 / 2.0);
     let backgound = Vec4f::new(0.22, 0.44, 0.66, 1.0);
     let mut option_perspective = Vec4f::new(
         45.0f32.to_radians(),
-        option_window.x / option_window.y,
+        option_window.w() / option_window.h(),
         0.1,
         1000.0,
     );
@@ -44,8 +40,8 @@ fn main() {
     let window = GlWindow::new(
         &display,
         "Test Rust Library",
-        option_window.x as u32,
-        option_window.y as u32,
+        option_window.w() as u32,
+        option_window.h() as u32,
         4,
         6,
     )
@@ -83,6 +79,12 @@ fn main() {
     toogles.running = true;
     // ============================================================
     // ============================================================
+    let mut proj = Mat4vf::perspective(
+        option_perspective.fov(),    //FOV
+        option_perspective.aspect(), //aspect
+        option_perspective.near(),   //near
+        option_perspective.far(),    //far
+    );
     while toogles.running {
         timer.update();
 
@@ -94,22 +96,31 @@ fn main() {
                 }
                 Event::Resize { width, height } => {
                     gl.viewport(width, height);
-                    option_perspective.y = width as f32 / height as f32; //aspect
-                    option_window.z = width as f32 / 2.0;
-                    option_window.w = height as f32 / 2.0;
+                    option_perspective.set_aspect(width as f32 / height as f32); //aspect
+                    option_window.set_center_x(width as f32 / 2.0);
+                    option_window.set_center_y(height as f32 / 2.0);
+                    proj = Mat4vf::perspective(
+                        option_perspective.fov(),    //FOV
+                        option_perspective.aspect(), //aspect
+                        option_perspective.near(),   //near
+                        option_perspective.far(),    //far
+                    );
                 }
                 Event::MouseMove { x, y } => {
                     // 1. Считаем смещение относительно центра
                     if toogles.togle_mouse {
-                        let dx = x - option_window.z as i32;
-                        let dy = y - option_window.w as i32;
+                        let dx = x - option_window.center_x() as i32;
+                        let dy = y - option_window.center_y() as i32;
 
                         // 2. Если мышь сдвинулась, обновляем камеру и возвращаем курсор назад
                         if dx != 0 || dy != 0 {
                             camera.update_angles(dx, dy);
 
                             // 3. Важно: возвращаем мышь в центр, чтобы она никогда не дошла до края
-                            window.warp_center(option_window.z as i32, option_window.w as i32);
+                            window.warp_center(
+                                option_window.center_x() as i32,
+                                option_window.center_y() as i32,
+                            );
                         }
                     }
                 }
@@ -170,14 +181,8 @@ fn main() {
         }
         camera.update_input(&input, &timer);
         //println!("{:?}", camera.position);
-        gl.clear_color_depth(backgound.x, backgound.y, backgound.z, backgound.w);
+        gl.clear_color_depth(backgound.r(), backgound.g(), backgound.b(), backgound.a());
         let view = camera.get_view_matrix();
-        let proj = Mat4vf::perspective(
-            option_perspective.x, //FOV
-            option_perspective.y, //aspect
-            option_perspective.z, //near
-            option_perspective.w, //far
-        );
         let pv = proj * view; //proj * view * Mat4vf::identity()
         shader_main.use_shader();
         shader_main.set_mat4("pv", &pv);
