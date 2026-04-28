@@ -43,11 +43,17 @@ fn main() {
     // ============================================================
     // ============================================================
     let cube = Cube::new(&gl, tex);
-    let mut cube_transform = Transformer::new(
-        Vec3f::new(0.0, 0.0, 0.0),
-        Quatf::identity(),
-        Vec3f::new(1.0, 1.0, 1.0),
-    );
+
+    let mut instances = Vec::new();
+    for x in -5..5 {
+        for z in -5..5 {
+            instances.push(Transformer::new(
+                Vec3f::new(x as f32 * 1.0, 0.0, z as f32 * 1.0),
+                Quatf::identity(),
+                Vec3f::new(1.0, 1.0, 1.0),
+            ));
+        }
+    }
     // ============================================================
     // ============================================================
 
@@ -62,7 +68,7 @@ fn main() {
         timer.update();
         input.handle_events(&mut camera, &mut base);
         camera.update_input(&input, &timer);
-        cube_transform.rotation(1.0, &Vec3f::new(0.0, 1.0, 0.0), timer.delta_time);
+        // cube_transform.rotation(1.0, &Vec3f::new(0.0, 1.0, 0.0), timer.delta_time);
         //println!("{:?}", camera.position);
         gl.clear_color_depth(
             base.background.r(),
@@ -71,11 +77,14 @@ fn main() {
             base.background.a(),
         );
         let view = camera.get_view_matrix();
-        let model = cube_transform.get_model_matrix();
-        let pv = base.projection * view * model; //proj * view * Mat4vf::identity()
         shader_main.use_shader();
-        shader_main.set_mat4("pv", &pv);
-        cube.draw(&gl, &shader_main);
+        for (_i, o) in instances.iter().enumerate() {
+            let model = o.get_model_matrix();
+            let pv = base.projection * view * model; //proj * view * Mat4vf::identity()
+            shader_main.set_mat4("pv", &pv);
+            cube.draw(&gl, &shader_main);
+        }
+
         base.window.swap_buffers();
     }
 }
