@@ -7,8 +7,6 @@ pub struct Cube<'a> {
     vao: u32,
     vbo: u32,
     texture: u32,
-    // loc_tex: i32,
-    // loc_model: i32,
     gl: &'a GlFunctions,
 }
 
@@ -51,17 +49,12 @@ impl<'a> Cube<'a> {
             vao: vao,
             vbo: vbo,
             texture: text,
-            // loc_tex: loct,
-            // loc_model: locm,
             gl: gl,
         }
     }
     pub fn draw(&self, gl: &GlFunctions, shader: &Shader) {
         shader.set_int("tex", 0);
         shader.set_mat4("model", &Mat4vf::IDENTITY);
-        // gl.uniform_1i(self.loc_tex, 0);
-        // gl.uniform_matrix_4fv(self.loc_model, 1, Mat4vf::IDENTITY.as_ptr());
-
         gl.active_texture0();
         gl.bind_texture_2d(self.texture);
         gl.bind_vertex_array(self.vao);

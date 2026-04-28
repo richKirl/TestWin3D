@@ -18,19 +18,19 @@ pub struct Camera {
 #[rustfmt::skip]
 impl Camera {
     pub fn new(position: Vec3f) -> Self {
-        Self {
+        let mut cam = Self {
             position,
-            forward: Vec3f::new(0.0, 0.0, 0.0),
-            yaw: -90.0, // Чтобы камера смотрела "вперед" по умолчанию
+            forward: Vec3f::new(0.0, 0.0, -1.0), // Сразу не нулевой
+            yaw: -90.0,
             pitch: 0.0,
             walk_speed: 3.6,
-        }
+        };
+        cam.update_vectors(); // Считаем правильный forward сразу
+        cam
     }
-    pub fn get_ortho_matrix(&mut self, w: f32, h: f32) -> Mat4vf {
-        return Mat4vf::orthographic(-w / 2.0, w / 2.0, -h / 2.0, h / 2.0, -1.0, 1.0);
-    }
-    pub fn get_view_matrix(&mut self) -> Mat4vf {
-        // Вычисляем вектор направления взгляда из углов
+
+    // Выносим расчет векторов отдельно
+    fn update_vectors(&mut self) {
         let yaw_rad = self.yaw.to_radians();
         let pitch_rad = self.pitch.to_radians();
 
@@ -38,43 +38,96 @@ impl Camera {
             yaw_rad.cos() * pitch_rad.cos(),
             pitch_rad.sin(),
             yaw_rad.sin() * pitch_rad.cos(),
-        )
-        .normalize();
+        ).normalize();
+    }
 
-        let up = Vec3f::new(0.0, 1.0, 0.0);
-
-        // Используем ваш метод LookAt
+    pub fn get_view_matrix(&mut self) -> Mat4vf {
+        // Теперь здесь не нужно считать forward,
+        // он всегда актуален благодаря update_vectors
         Mat4vf::look_at(
             self.position,
             self.position + self.forward,
-            up,
+            WORLD_UP,
         )
     }
+
     pub fn update_angles(&mut self, xrel: i32, yrel: i32) {
         self.yaw += xrel as f32 * 0.1;
         self.pitch -= yrel as f32 * 0.1;
+        self.pitch = self.pitch.clamp(-89.0, 89.0);
 
-        // Ограничение, чтобы не "перевернуться" через голову
-        if self.pitch > 89.0 {
-            self.pitch = 89.0;
-        }
-        if self.pitch < -89.0 {
-            self.pitch = -89.0;
-        }
+        self.update_vectors(); // Обновляем вектор сразу после поворота головы
     }
-    pub fn update_input(&mut self,input: &InputState,timer: &Timer){
+
+    pub fn update_input(&mut self, input: &InputState, timer: &Timer) {
         let speed = self.walk_speed * timer.delta_time;
-        if input.w {
-            self.position += self.forward * speed;
-        }
-        if input.s {
-            self.position -= self.forward * speed;
-        }
-        if input.a {
-            self.position -= self.forward.cross(WORLD_UP).normalize() * speed;
-        }
-        if input.d {
-            self.position += self.forward.cross(WORLD_UP).normalize() * speed;
-        }
+
+        // Кэшируем вектор "вправо", чтобы не считать cross() дважды
+        let right = self.forward.cross(WORLD_UP).normalize();
+
+        if input.w { self.position += self.forward * speed; }
+        if input.s { self.position -= self.forward * speed; }
+        if input.a { self.position -= right * speed; }
+        if input.d { self.position += right * speed; }
     }
 }
+// impl Camera {
+//     pub fn new(position: Vec3f) -> Self {
+//         Self {
+//             position,
+//             forward: Vec3f::new(0.0, 0.0, 0.0),
+//             yaw: -90.0, // Чтобы камера смотрела "вперед" по умолчанию
+//             pitch: 0.0,
+//             walk_speed: 3.6,
+//         }
+//     }
+//     pub fn get_ortho_matrix(&mut self, halfw: f32, halfh: f32) -> Mat4vf {
+//         return Mat4vf::orthographic(-halfw, halfw, -halfh, halfh, -1.0, 1.0);
+//     }
+//     pub fn get_view_matrix(&mut self) -> Mat4vf {
+//         // Вычисляем вектор направления взгляда из углов
+//         let yaw_rad = self.yaw.to_radians();
+//         let pitch_rad = self.pitch.to_radians();
+
+//         self.forward = Vec3f::new(
+//             yaw_rad.cos() * pitch_rad.cos(),
+//             pitch_rad.sin(),
+//             yaw_rad.sin() * pitch_rad.cos(),
+//         )
+//         .normalize();
+
+//         // Используем ваш метод LookAt
+//         Mat4vf::look_at(
+//             self.position,
+//             self.position + self.forward,
+//             WORLD_UP,
+//         )
+//     }
+//     pub fn update_angles(&mut self, xrel: i32, yrel: i32) {
+//         self.yaw += xrel as f32 * 0.1;
+//         self.pitch -= yrel as f32 * 0.1;
+
+//         // Ограничение, чтобы не "перевернуться" через голову
+//         if self.pitch > 89.0 {
+//             self.pitch = 89.0;
+//         }
+//         if self.pitch < -89.0 {
+//             self.pitch = -89.0;
+//         }
+//     }
+//     pub fn update_input(&mut self,input: &InputState,timer: &Timer){
+//         let speed = self.walk_speed * timer.delta_time;
+//         if input.w {
+//             self.position += self.forward * speed;
+//         }
+//         if input.s {
+//             self.position -= self.forward * speed;
+//         }
+//         if input.a {
+//             self.position -= self.forward.cross(WORLD_UP).normalize() * speed;
+//         }
+//         if input.d {
+//             self.position += self.forward.cross(WORLD_UP).normalize() * speed;
+//         }
+//     }
+// }
