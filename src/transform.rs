@@ -1,4 +1,4 @@
-use math3d::{mat4vf::Mat4vf, quatf::Quatf, vec3f::Vec3f};
+use mxg11m::{mat4vf::Mat4vf, quatf::Quatf, vec3f::Vec3f};
 
 pub struct Transformer {
     pub position: Vec3f,

@@ -1,6 +1,6 @@
 // use crate::autoMesh::auto_mesh::vertices;
-use math3d::mat4vf::Mat4vf;
 use mxg11l::GlFunctions;
+use mxg11m::mat4vf::Mat4vf;
 
 use crate::{Shader, autoMesh::auto_mesh::VERTICES_CUBE};
 pub struct Cube<'a> {

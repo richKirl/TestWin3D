@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
-use math3d::mat4vf::Mat4vf;
 use mxg11l::GlFunctions;
+use mxg11m::mat4vf::Mat4vf;
 
 pub struct Shader<'a> {
     id: u32,

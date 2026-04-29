@@ -1,8 +1,8 @@
-#[allow(non_snake_case, unused)]
-use math3d::{dualquatf, frustum, mat4vf, quatf, vec3d, vec3f, vec4d, vec4f};
-use math3d::{quatf::Quatf, vec3f::Vec3f};
+use mxg11i::TgaImage;
 use mxg11l::{GlFunctions, Timer, XDisplay};
-use mxgimage::TgaImage;
+#[allow(non_snake_case, unused)]
+use mxg11m::{dualquatf, frustum, mat4vf, quatf, vec3d, vec3f, vec4d, vec4f};
+use mxg11m::{quatf::Quatf, vec3f::Vec3f};
 #[allow(non_snake_case)]
 mod autoMesh;
 mod basestate;
