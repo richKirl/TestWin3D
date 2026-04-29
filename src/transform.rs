@@ -2,16 +2,16 @@ use mxg11m::{mat4vf::Mat4vf, quatf::Quatf, vec3f::Vec3f};
 
 pub struct Transformer {
     pub position: Vec3f,
-    pub rotation: Quatf,
     pub scale: Vec3f,
+    pub rotation: Quatf,
 }
 #[allow(unused)]
 impl Transformer {
     pub fn new(position: Vec3f, rotation: Quatf, scale: Vec3f) -> Self {
         Self {
             position,
-            rotation,
             scale,
+            rotation,
         }
     }
     pub fn translate(&mut self, vec: &Vec3f) {

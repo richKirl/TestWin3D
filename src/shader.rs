@@ -12,11 +12,8 @@ pub struct Shader<'a> {
 impl<'a> Shader<'a> {
     pub fn new(verts: Vec<&'a str>, gl: &'a GlFunctions) -> Self {
         let mut temp_locs: HashMap<&str, u32> = HashMap::new();
-        let program = gl.compilation_shaders(
-            &gl,
-            verts.get(0).expect("oh vs"),
-            verts.get(1).expect("oh fs"),
-        );
+        let program =
+            gl.compilation_shaders_(verts.get(0).expect("oh vs"), verts.get(1).expect("oh fs"));
         for src in verts.iter() {
             for line in src.lines() {
                 if line.contains("layout") && !line.contains("in") {
