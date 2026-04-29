@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-my_x11_gl = { path = "../my_x11_gl" }
-mxgimage = { path = "../mxgimage" }
-math3D = { path = "../math3D" }
-mxgfs = { path = "../mxgfs" }
+mxg11l = { path = "../mxg11l" }
+mxg11i = { path = "../mxg11i" }
+mxg11m = { path = "../mxg11m" }
+mxg11fs = { path = "../mxg11fs" }
 [profile.release]
 opt-level = 3
 lto = true          # Link Time Optimization (очень важно для инлайнинга функций из других модулей)
